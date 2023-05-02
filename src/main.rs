@@ -1,11 +1,15 @@
 use std::io;
 
-use tokio::net::{TcpListener, TcpStream};
+use tokio::{
+    io::Interest,
+    net::{TcpListener, TcpStream},
+};
 
 #[tokio::main]
 async fn main() {
     println!("starting server...");
     let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
+    listener.set_ttl(100).unwrap();
     loop {
         match listener.accept().await {
             Ok((socket, addr)) => {
@@ -25,6 +29,15 @@ async fn main() {
 async fn process(socket: TcpStream, addr: std::net::SocketAddr) {
     let mut buf = [0; 1024];
     loop {
+        match socket.ready(Interest::READABLE | Interest::WRITABLE).await {
+            Ok(ready) => {
+                if ready.is_read_closed() || ready.is_write_closed() {
+                    println!("connection closed");
+                    return;
+                }
+            }
+            Err(err) => eprintln!("error while checking readiness: {}", err),
+        };
         match socket.try_read(&mut buf) {
             Ok(n) => {
                 if n == 0 {
