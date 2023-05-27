@@ -7,3 +7,11 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.28.0", features = ["full"] }
+rmp = "0.8.11"
+rmp-serde = "1.1.1"
+serde = { version = "1.0.163", features = ["std", "derive", "serde_derive"] }
+minimal-eventstore = "0.1.2"
+rusqlite = { version = "0.28.0", features = ["bundled"] }
+uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
+r2d2_sqlite = "0.21.0"
+r2d2 = "0.8.10"
